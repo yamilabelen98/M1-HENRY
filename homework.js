@@ -1,112 +1,66 @@
 "use strict";
 
-// Closures
+const { queue } = require("@11ty/eleventy-cache-assets");
 
-function counter() {
-  /*
-  Ejercicio 1
+/*
+Definir las funciones recursivas nFactorial y nFibonacci.
 
-  La función counter debe retornar otra función. Esta función retornada debe actuar como un contador, retornando un valor numérico que empieza en 1 e incrementa con cada invocación.
+nFactorial(n) debe retornar el factorial de n sabiendo que, siendo n un número natural, su factorial (representado como n!) es el producto de n por todos los números naturales menores que él y mayores a 0. Ejemplo: 5! = 5 * 4 * 3 * 2 * 1
 
-  Ejemplo:
-  const nuevoContador = counter()
-  nuevoContador()     // 1
-  nuevoContador()     // 2
-  nuevoContador()     // 3
+nFibonacci(n) debe retornar el enésimo número de la secuencia de Fibonacci, tomando al 0 y al 1, respectivamente, como primer y segundo elementos de la misma, y sabiendo que cualquier elemento que se agregue a esta secuencia será el resultado de la suma del último elemento y el anterior.
+Ejemplo: nFibonacci(7) retornará 13, ya que 13 es el dígito que está en la posición 7 de la secuencia.
 
-  const otroContador = counter()
-  otroContador()      // 1
-  otroContador()      // 2
-  otroContador()      // 3
-   */
-  var contador = 0;
-  return function () {
-    contador = contador + 1;
-    return contador;
-  };
-}
-
-function cacheFunction(cb) {
-  /*
-  Ejercicio 2
-
-  Tu tarea aquí es lograr, mediante un closure, que cacheFunction actúe como una memoria caché para el callback que recibe por parámetro (cb); es decir, que "recuerde" el resultado de cada operación que hace, de manera que, al realizar una operación por segunda vez, se pueda obtener el resultado de esa "memoria" sin tener que efectuar otra vez cálculos que ya se hicieron anteriormente.
-
-  cacheFunction debe retornar una función. Esta función debe aceptar un argumento (arg) e invocar a cb con ese argumento; hecho eso, debe guardar el argumento junto con el resultado de la invocación (tip: usá un objeto donde cada propiedad sea el argumento, y su valor el resultado de la correspondiente invocación a cb) de manera que, la próxima vez que reciba el mismo argumento, no sea necesario volver a invocar a cb, porque el resultado estará guardado en la "memoria caché".
+Secuencia:  0, 1, 1, 2, 3, 5, 8, 13, 21, 34, ... 
 
 
-  Ejemplo:
-  function square(n){
-    return n * n
+Como ejercicio adicional y completamente opcional, al terminar de resolver este problema pueden intentar definir funciones que logren los mismos resultados pero de manera iterativa.
+*/
+
+function nFactorial(n) {
+  if (n <= 1) {
+    return 1;
+  } else if (n > 1) {
+    return n * nFactorial(n - 1);
   }
-
-  const squareCache = cacheFunction(square)
-
-  squareCache(5)    // invocará a square(5), almacenará el resultado y lo retornará
-  squareCache(5)    // no volverá a invocar a square, simplemente buscará en la caché cuál es el resultado de square(5) y lo retornará (tip: si usaste un objeto, podés usar hasOwnProperty)
-  */
-  var obj = new Object(); //ESTE OBJETO TIENE QUE ESTAR AFUERA DE LA FUNCION PARA RETENER EL VALOR DE LAS PROPIEDADES PASADAS POR ARGUMENTO
-  return function (arg) {
-    if (obj.hasOwnProperty(arg)) {
-      //SI EL OBJETO TIENE LA PROP ARG DEVUELVE TRUE
-      return obj[arg]; //ACA DEVUELVE EL VALOR DE LA PROP ARG => obj={arg:cb(arg)}
-    } else {
-      obj[arg] = cb(arg); //SI NO TIENE LA PROP ARG, LA ASIGNA MEDIANTE IGUALACION
-      return obj[arg]; //DEVUELVE EL VALOR DE LA PROP ARG. NO EL CALLBACK CB
-    }
-  };
 }
 
-// Bind
-
-var instructor = {
-  nombre: "Franco",
-  edad: 25,
-};
-
-var alumno = {
-  nombre: "Juan",
-  curso: "FullStack",
-};
-
-function getNombre() {
-  return this.nombre;
+function nFibonacci(n) {
+  if (n === 1) {
+    return 1;
+  } else if (n > 1) {
+    return nFibonacci(n - 1) + nFibonacci(n - 2);
+  } else if (n === 0) {
+    return 0;
+  }
 }
 
 /*
-  Ejercicio 3
+Implementar la clase Queue, sabiendo que es una estructura de tipo FIFO, donde el primer elemento que ingresa es el primero que se quita. Definir los siguientes métodos:
+  - enqueue: agrega un valor respetando el orden.
+  - dequeue: remueve un valor respetando el orden. Retorna undefined cuando la queue está vacía.
+  - size: retorna el tamaño (cantidad de elementos) de la queue.
 
-  IMPORTANTE: no modificar el código de arriba (variables instructor y alumno, y función getNombre)
-
-  Usando el método bind() guardar, en las dos variables declaradas a continuación, dos funciones que actúen como getNombre pero retornen el nombre del instructor y del alumno, respectivamente.
+Pueden utilizar class o función constructora.
 */
 
-let getNombreInstructor = getNombre.bind(instructor);
-let getNombreAlumno = getNombre.bind(alumno);
-
-/*
-  Ejercicio 4
-  
-  Sin modificar la función crearCadena, usar bind para guardar, en las tres variables declaradas a continuación, tres funciones que retornen una cadena (string) y el delimitador especificado (asteriscos, guiones, y guiones bajos, respectivamente). Las funciones obtenidas deberían recibir solamente un argumento - la cadena de texto - ya que los otros argumentos habrán sido "bindeados". 
-*/
-
-function crearCadena(delimitadorIzquierda, delimitadorDerecha, cadena) {
-  return delimitadorIzquierda + cadena + delimitadorDerecha;
+function Queue() {
+  this.array = [];
 }
-
-let textoAsteriscos = crearCadena.bind(this, "*", "*");
-let textoGuiones = crearCadena.bind(this, "-", "-");
-let textoUnderscore = crearCadena.bind(this, "_", "_");
+Queue.prototype.enqueue = function (valor) {
+  return this.array.push(valor);
+};
+Queue.prototype.dequeue = function () {
+  return this.array.shift();
+};
+Queue.prototype.size = function () {
+  return this.array.length;
+};
 
 // No modifiquen nada debajo de esta linea
 // --------------------------------
 
 module.exports = {
-  counter,
-  cacheFunction,
-  getNombreInstructor,
-  getNombreAlumno,
-  textoAsteriscos,
-  textoGuiones,
-  textoUnderscore,
+  Queue,
+  nFactorial,
+  nFibonacci,
 };
